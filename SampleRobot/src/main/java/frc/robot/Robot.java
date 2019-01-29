@@ -7,7 +7,12 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -24,6 +29,12 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  WPI_TalonSRX leftMotor = new WPI_TalonSRX(1);
+  WPI_TalonSRX rightMotor = new WPI_TalonSRX(2);
+
+  DifferentialDrive drive = new DifferentialDrive(leftMotor, rightMotor);
+
+  Joystick joy = new Joystick(0);
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -33,6 +44,11 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    
+    
+
+
   }
 
   /**
@@ -86,6 +102,20 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+
+    /* get gamepad stick values */
+    double forward = -1 * joy.getRawAxis(1); /* positive is forward */
+    double turn = +1 * joy.getRawAxis(2); /* positive is right */
+    boolean btn1 = joy.getRawButton(1); /* is button is down, print joystick values */
+
+    /* deadband gamepad 10% */
+    if (Math.abs(forward) < 0.10) {
+        forward = 0;
+    }
+    if (Math.abs(turn) < 0.10) {
+        turn = 0;
+    }
+    drive.arcadeDrive(forward, turn);
   }
 
   /**
